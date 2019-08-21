@@ -111,6 +111,7 @@ body {
 
 .container .content .addtask {
     width: 100%;
+    padding: 15px;
 }
 
 .container .content .addtask input {
@@ -127,4 +128,12 @@ body {
 .container .content .addtask i:hover {
     -webkit-transform: scale(1.05);
     transform: scale(1.05);
+}
+
+.content .error {
+    padding: 10px;
+    color: white;
+    background-color: red;
+    width: 100%;
+    text-align: center;
 }

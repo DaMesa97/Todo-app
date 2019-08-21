@@ -10,7 +10,15 @@ class Todo {
 
 class Ui {
     showAlert(message) {
-        return alert(message)
+        const error = document.createElement('div');
+        error.textContent = message;
+        error.classList.add('error');
+        document.querySelector('.content').appendChild(error);
+    }
+    clearAlert() {
+        setTimeout(function () {
+            document.querySelector('.error').remove();
+        }, 2000)
     }
     addTodoToList(todo) {
         index++;
@@ -104,12 +112,14 @@ const addTodo = function () {
     const inputValue = document.querySelector('.addtask input').value
     const ui = new Ui();
     if (inputValue === "" || typeof inputValue === "number") {
-        return ui.showAlert(`Nieprawidłowa wartość!`)
+        ui.showAlert(`Nieprawidłowa wartość!`)
+        return ui.clearAlert();
     }
     const todo = new Todo(inputValue);
     if (ui.checkIfIncludes(todo)) {
         ui.clearField();
-        return ui.showAlert(`Posiadasz już to zadanie!`);
+        ui.showAlert(`Posiadasz już to zadanie!`);
+        return ui.clearAlert();
     }
     tasks.push(todo);
     ui.addTodoToList(todo);
@@ -126,6 +136,8 @@ document.querySelector('.addtask input').addEventListener('focus', function () {
         }
     })
 })
+
+
 
 document.querySelector('.tasks').addEventListener('click', function (e) {
     const ui = new Ui();
