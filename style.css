@@ -1,0 +1,130 @@
+* {
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-family: roboto;
+}
+
+body {
+    background-color: #21b6db;
+}
+
+.container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    width: 400px;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: white;
+    -webkit-box-shadow: 3px 4px 16px 5px rgba(0, 0, 0, 0.75);
+    box-shadow: 3px 4px 16px 5px rgba(0, 0, 0, 0.75);
+}
+
+.container .header {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+}
+
+.container .header .image {
+    height: 80%;
+}
+
+.container .header .topbar {
+    padding: 5px;
+    font-size: 18px;
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    -ms-flex-item-align: center;
+    align-self: center;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: row;
+    flex-direction: row;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+}
+
+.container .content {
+    min-height: 50vh;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+}
+
+.container .content .tasks {
+    -ms-flex-preferred-size: 90%;
+    flex-basis: 90%;
+    width: 100%;
+}
+
+.container .content .tasks ul {
+    list-style-type: none;
+    padding: 0 10px;
+}
+
+.container .content .tasks ul li {
+    width: 100%;
+    padding: 5px;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+.container .content .tasks ul li i {
+    position: absolute;
+    right: 5%;
+    cursor: pointer;
+}
+
+.container .content .tasks ul li.done {
+    background-color: #3be373;
+}
+
+.container .content .tasks ul li:hover {
+    background-color: pink;
+    cursor: pointer;
+}
+
+.container .content .addtask {
+    width: 100%;
+}
+
+.container .content .addtask input {
+    width: 90%;
+    margin: 0 10px;
+}
+
+.container .content .addtask i {
+    cursor: pointer;
+    -webkit-transition: .2s;
+    transition: .2s;
+}
+
+.container .content .addtask i:hover {
+    -webkit-transform: scale(1.05);
+    transform: scale(1.05);
+}
