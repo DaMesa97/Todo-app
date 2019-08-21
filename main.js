@@ -100,7 +100,7 @@ const displayTime = () => {
     setTimeout(displayTime, 1000)
 }
 
-addIcon.addEventListener('click', function () {
+const addTodo = function () {
     const inputValue = document.querySelector('.addtask input').value
     const ui = new Ui();
     if (inputValue === "" || typeof inputValue === "number") {
@@ -109,13 +109,23 @@ addIcon.addEventListener('click', function () {
     const todo = new Todo(inputValue);
     if (ui.checkIfIncludes(todo)) {
         ui.clearField();
-        ui.showAlert(`Posiadasz już to zadanie!`);
+        return ui.showAlert(`Posiadasz już to zadanie!`);
     }
     tasks.push(todo);
     ui.addTodoToList(todo);
     ui.saveToLocalStorage();
     ui.clearField();
-});
+}
+
+addIcon.addEventListener('click', addTodo);
+
+document.querySelector('.addtask input').addEventListener('focus', function () {
+    document.addEventListener('keypress', function (e) {
+        if (e.keyCode === 13) {
+            addTodo();
+        }
+    })
+})
 
 document.querySelector('.tasks').addEventListener('click', function (e) {
     const ui = new Ui();
