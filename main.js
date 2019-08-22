@@ -1,7 +1,7 @@
 let tasks = [];
 let index = -1;
 let ready = true;
-const forbiddenChars = ["/</g", "/>/g"];
+const forbiddenChars = ["<", ">"];
 
 const input = document.querySelector('.addtask input');
 
@@ -14,12 +14,19 @@ class Todo {
 
 class Ui {
     showAlert(message) {
+        if (document.querySelector('.content').lastElementChild.classList.contains('error')) {
+            document.querySelector('.content').lastElementChild.textContent = message;
+            return;
+        }
         const error = document.createElement('div');
         error.textContent = message;
         error.classList.add('error');
         document.querySelector('.content').appendChild(error);
     }
     clearAlert() {
+        if (document.getElementsByClassName('error')[0] === undefined) {
+            return;
+        }
         document.getElementsByClassName('error')[0].remove();
         ready = true;
     }
@@ -113,7 +120,8 @@ const displayTime = () => {
 
 const addTodo = function () {
     if (ready) {
-        const inputValue = input.value
+        let inputValue = input.value
+        inputValue = inputValue.replace(/<[^>]*>/g, '');
         const ui = new Ui();
         if (inputValue === "" || typeof inputValue === "number") {
             ui.showAlert(`Nieprawidłowa wartość!`)
