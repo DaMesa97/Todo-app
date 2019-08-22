@@ -155,6 +155,11 @@ input.addEventListener('input', function () {
     }
 })
 
+input.addEventListener('blur', () => {
+    const ui = new Ui();
+    ui.clearAlert();
+})
+
 document.querySelector('.tasks').addEventListener('click', function (e) {
     const ui = new Ui();
     ui.deleteTodo(e.target);
