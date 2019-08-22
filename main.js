@@ -1,6 +1,7 @@
 let tasks = [];
 let index = -1;
 let ready = true;
+const forbiddenChars = ["/</g", "/>/g"];
 
 const input = document.querySelector('.addtask input');
 
@@ -156,8 +157,10 @@ input.addEventListener('input', function () {
 })
 
 input.addEventListener('blur', () => {
-    const ui = new Ui();
-    ui.clearAlert();
+    if (document.querySelector('.content').lastElementChild.classList.contains('error')) {
+        const ui = new Ui();
+        ui.clearAlert();
+    }
 })
 
 document.querySelector('.tasks').addEventListener('click', function (e) {
