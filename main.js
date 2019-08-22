@@ -1,5 +1,8 @@
 let tasks = [];
 let index = -1;
+let ready = true;
+
+const input = document.querySelector('.addtask input');
 
 class Todo {
     constructor(value) {
@@ -16,9 +19,8 @@ class Ui {
         document.querySelector('.content').appendChild(error);
     }
     clearAlert() {
-        setTimeout(function () {
-            document.querySelector('.error').remove();
-        }, 2000)
+        document.getElementsByClassName('error')[0].remove();
+        ready = true;
     }
     addTodoToList(todo) {
         index++;
@@ -28,7 +30,7 @@ class Ui {
         list.appendChild(element);
     }
     clearField() {
-        document.querySelector('.addtask input').value = '';
+        input.value = '';
     }
     deleteTodo(target) {
         if (target.className === 'fas fa-minus') {
@@ -109,35 +111,49 @@ const displayTime = () => {
 }
 
 const addTodo = function () {
-    const inputValue = document.querySelector('.addtask input').value
-    const ui = new Ui();
-    if (inputValue === "" || typeof inputValue === "number") {
-        ui.showAlert(`Nieprawidłowa wartość!`)
-        return ui.clearAlert();
-    }
-    const todo = new Todo(inputValue);
-    if (ui.checkIfIncludes(todo)) {
+    if (ready) {
+        const inputValue = input.value
+        const ui = new Ui();
+        if (inputValue === "" || typeof inputValue === "number") {
+            ui.showAlert(`Nieprawidłowa wartość!`)
+            ready = false;
+            return setTimeout(() => ui.clearAlert(), 3000);
+        }
+        const todo = new Todo(inputValue);
+        if (ui.checkIfIncludes(todo)) {
+            ui.clearField();
+            ui.showAlert(`Posiadasz już to zadanie!`);
+            return setTimeout(() => ui.clearAlert(), 3000);
+        }
+        tasks.push(todo);
+        ui.addTodoToList(todo);
+        ui.saveToLocalStorage();
         ui.clearField();
-        ui.showAlert(`Posiadasz już to zadanie!`);
-        return ui.clearAlert();
     }
-    tasks.push(todo);
-    ui.addTodoToList(todo);
-    ui.saveToLocalStorage();
-    ui.clearField();
 }
 
 addIcon.addEventListener('click', addTodo);
 
-document.querySelector('.addtask input').addEventListener('focus', function () {
-    document.addEventListener('keypress', function (e) {
+document.addEventListener('keydown', function (e) {
+    if (input === document.activeElement) {
         if (e.keyCode === 13) {
             addTodo();
         }
-    })
+    }
 })
 
-
+input.addEventListener('input', function () {
+    const ui = new Ui();
+    if (input.value === '') {
+        ui.showAlert('Uzupełnij pole!')
+        ready = false;
+    } else {
+        if (document.querySelector('.content').lastElementChild.classList.contains('error')) {
+            ui.clearAlert();
+        }
+        ready = true;
+    }
+})
 
 document.querySelector('.tasks').addEventListener('click', function (e) {
     const ui = new Ui();
