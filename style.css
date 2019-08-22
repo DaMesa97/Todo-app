@@ -63,7 +63,7 @@ body {
 }
 
 .container .content {
-    min-height: 50vh;
+    min-height: 45vh;
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
@@ -136,4 +136,42 @@ body {
     background-color: red;
     width: 100%;
     text-align: center;
+}
+
+@media only screen and (max-width : 320px) {
+    .container {
+        width: 90%;
+        height: 90vh;
+    }
+
+    .container .header {
+        height: 40%;
+    }
+
+    .container .header .image {
+        height: 70%;
+    }
+
+    .container .header .topbar {
+        flex-grow: 1;
+        padding: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container .content {
+        height: 80%;
+    }
+
+    .container .content .addtask {
+        padding: 0;
+    }
+
+    .container .content .addtask input {
+        width: 90%;
+        margin: 0;
+        margin: 0 5px;
+        padding: 5px;
+    }
 }
