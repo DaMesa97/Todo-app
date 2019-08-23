@@ -121,7 +121,6 @@ const displayTime = () => {
 const addTodo = function () {
     if (ready) {
         let inputValue = input.value
-        inputValue = inputValue.replace(/<[^>]*>/g, '');
         const ui = new Ui();
         if (inputValue === "" || typeof inputValue === "number") {
             ui.showAlert(`Nieprawidłowa wartość!`)
