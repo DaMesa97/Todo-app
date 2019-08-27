@@ -1,52 +1,26 @@
-let tasks = [];
-let index = -1;
-let ready = true;
-const forbiddenChars = ["<", ">"];
+const wrongChars = ["<", ">"];
+let todos = [];
+let index = 0;
 
 const input = document.querySelector('.addtask input');
+const addIcon = document.querySelector('.addtask i');
 
 class Todo {
     constructor(value) {
         this.value = value;
         this.completed = false;
     }
+    checkIfAllowed() {
+        if (this.value.includes(wrongChars[0]) || this.value.includes(wrongChars[1])) {
+            return false;
+        }
+        else return true;
+    }
 }
 
 class Ui {
-    showAlert(message) {
-        if (document.querySelector('.content').lastElementChild.classList.contains('error')) {
-            document.querySelector('.content').lastElementChild.textContent = message;
-            return;
-        }
-        const error = document.createElement('div');
-        error.textContent = message;
-        error.classList.add('error');
-        document.querySelector('.content').appendChild(error);
-    }
-    clearAlert() {
-        if (document.getElementsByClassName('error')[0] === undefined) {
-            return;
-        }
-        document.getElementsByClassName('error')[0].remove();
-        ready = true;
-    }
-    addTodoToList(todo) {
-        index++;
-        const list = document.querySelector('.tasks ul');
-        const element = document.createElement('li');
-        element.innerHTML = `${todo.value} <i class="fas fa-minus" id="${index}">`
-        list.appendChild(element);
-    }
     clearField() {
         input.value = '';
-    }
-    deleteTodo(target) {
-        if (target.className === 'fas fa-minus') {
-            tasks.splice(target.id, 1)
-            target.parentNode.remove();
-            Render.clearList();
-            Render.renderList(tasks)
-        }
     }
     markAsDone(target) {
         if (target.tagName === 'LI') {
@@ -56,45 +30,85 @@ class Ui {
             } else tasks[target.firstElementChild.id].completed = false;
         }
     }
-    saveToLocalStorage() {
-        const jsonTasks = JSON.stringify(tasks);
-        localStorage.setItem('tasks', jsonTasks);
+}
+
+class Storage {
+    static save(todos) {
+        const jsonTodos = JSON.stringify(todos);
+        localStorage.setItem('todos', jsonTodos);
     }
-    checkIfIncludes(todo) {
-        for (let i = 0; i < tasks.length; i++) {
-            if (tasks[i].value.toLowerCase() === todo.value.toLowerCase()) {
+    static get() {
+        const jsonTasks = localStorage.getItem('todos');
+        todos = JSON.parse(jsonTasks);
+        if (!todos) {
+            todos = [];
+        }
+        return todos;
+    }
+}
+
+class List {
+    constructor() {
+        this.list = document.querySelector('.tasks ul');
+        this.listElement = document.createElement('li');
+    }
+
+    addTodoToList(todo) {
+        todos.push(todo);
+        this.listElement.innerHTML = `${todo.value} <i class="fas fa-minus" id="${index++}">`;
+        this.list.appendChild(this.listElement);
+        Storage.save(todos);
+    }
+    deleteTodoFromList(target) {
+        if (target.className === 'fas fa-minus') {
+            todos.splice(target.id, 1)
+            target.parentNode.remove();
+            this.refreshList();
+            Storage.save(todos);
+        }
+    }
+    refreshList() {
+        const list = document.querySelector('.tasks ul');
+        index = 0;
+        list.textContent = "";
+        todos.forEach((todo) => {
+            const listElement = document.createElement('li');
+            listElement.innerHTML = `${todo.value} <i class="fas fa-minus" id="${index++}">`
+            if (todo.completed) {
+                listElement.classList.add('done')
+            }
+            list.appendChild(listElement);
+        })
+    }
+    checkIfExistsOnList(todo) {
+        for (let i = 0; i < todos.length; i++) {
+            if (todos[i].value.toLowerCase() === todo.value.toLowerCase()) {
                 return true;
             }
         }
     }
 }
 
-class Render {
-    static getFromLocalStorage() {
-        const jsonTasks = localStorage.getItem('tasks');
-        tasks = JSON.parse(jsonTasks);
-        if (!tasks) {
-            tasks = [];
+class Alert {
+    constructor() {
+        this.exists = false;
+        this.parentElement = document.querySelector('.content');
+        this.container = document.createElement('div');
+    }
+    show(message) {
+        if (this.exists) {
+            return;
         }
+        this.exists = true;
+        this.container.classList.add('error');
+        this.container.textContent = message;
+        this.parentElement.appendChild(this.container);
     }
-    static renderList(list) {
-        index = -1;
-        list.forEach(element => {
-            index++;
-            const li = document.createElement('li');
-            li.innerHTML = `${element.value} <i class="fas fa-minus" id="${index}">`;
-            if (element.completed) {
-                li.classList.add('done');
-            }
-            document.querySelector('.tasks ul').appendChild(li);
-        });
-    }
-    static clearList() {
-        document.querySelector(`.tasks ul`).textContent = "";
+    delete() {
+        this.exists = false;
+        this.parentElement.lastChild.remove();
     }
 }
-
-const addIcon = document.querySelector('.addtask i');
 
 const displayTime = () => {
     const now = new Date();
@@ -118,70 +132,83 @@ const displayTime = () => {
     setTimeout(displayTime, 1000)
 }
 
-const addTodo = function () {
-    if (ready) {
-        let inputValue = input.value
-        const ui = new Ui();
-        if (inputValue === "" || typeof inputValue === "number") {
-            ui.showAlert(`Nieprawidłowa wartość!`)
-            ready = false;
-            return setTimeout(() => ui.clearAlert(), 3000);
-        }
-        const todo = new Todo(inputValue);
-        if (ui.checkIfIncludes(todo)) {
-            ui.clearField();
-            ui.showAlert(`Posiadasz już to zadanie!`);
-            return setTimeout(() => ui.clearAlert(), 3000);
-        }
-        tasks.push(todo);
-        ui.addTodoToList(todo);
-        ui.saveToLocalStorage();
-        ui.clearField();
-    }
-}
+const list = new List();
+const storage = new Storage();
+const ui = new Ui();
+const alert = new Alert();
 
-addIcon.addEventListener('click', addTodo);
-
-document.addEventListener('keydown', function (e) {
-    if (input === document.activeElement) {
-        if (e.keyCode === 13) {
-            addTodo();
-        }
-    }
-})
-
-input.addEventListener('input', function () {
-    const ui = new Ui();
-    if (input.value === '') {
-        ui.showAlert('Uzupełnij pole!')
-        ready = false;
-    } else {
-        if (document.querySelector('.content').lastElementChild.classList.contains('error')) {
-            ui.clearAlert();
-        }
-        ready = true;
-    }
-})
-
-input.addEventListener('blur', () => {
-    if (document.querySelector('.content').lastElementChild.classList.contains('error')) {
-        const ui = new Ui();
-        ui.clearAlert();
-    }
-})
-
-document.querySelector('.tasks').addEventListener('click', function (e) {
-    const ui = new Ui();
-    ui.deleteTodo(e.target);
-    ui.saveToLocalStorage();
-})
-
-document.querySelector('.tasks').addEventListener('click', function (e) {
-    const ui = new Ui();
-    ui.markAsDone(e.target);
-    ui.saveToLocalStorage();
-})
-
-Render.getFromLocalStorage();
-Render.renderList(tasks);
+//Wyrenderowanie todo po odświezeniu strony z local storage
+Storage.get();
+console.log(todos);
+list.refreshList();
+ui.clearField();
 displayTime();
+
+//Dodawanie todo click
+addIcon.addEventListener('click', function () {
+    const inputValue = input.value;
+    const list = new List();
+    const todo = new Todo(inputValue);
+    if ("" === todo.value) {
+        alert.show('Musisz coś wpisać!');
+        return setTimeout(() => { alert.delete() }, 2000);
+    }
+    else if (list.checkIfExistsOnList(todo)) {
+        alert.show('Posiadasz już to zadanie!');
+        return setTimeout(() => { alert.delete() }, 2000);
+    }
+    else if (!todo.checkIfAllowed()) {
+        alert.show('Nieprawidłowa wartość!');
+        return setTimeout(() => { alert.delete() }, 2000);
+    }
+    list.addTodoToList(todo);
+    Storage.save(todos);
+    ui.clearField();
+})
+
+//Dodawanie todo enter
+document.body.addEventListener('keydown', function (e) {
+    if (13 === e.keyCode) {
+        if (document.activeElement === input) {
+            const inputValue = input.value;
+            const list = new List();
+            const todo = new Todo(inputValue);
+            if ("" === todo.value) {
+                alert.show('Musisz coś wpisać!');
+                return setTimeout(() => { alert.delete() }, 2000);
+            }
+            else if (list.checkIfExistsOnList(todo)) {
+                alert.show('Posiadasz już to zadanie!');
+                return setTimeout(() => { alert.delete() }, 2000);
+            }
+            else if (!todo.checkIfAllowed()) {
+                alert.show('Nieprawidłowa wartość!');
+                return setTimeout(() => { alert.delete() }, 2000);
+            }
+            list.addTodoToList(todo);
+            Storage.save(todos);
+            ui.clearField();
+        }
+    }
+})
+
+//Usuwanie todo
+document.addEventListener('click', function (e) {
+    if ("I" === e.target.tagName) {
+        const list = new List();
+        list.deleteTodoFromList(e.target);
+        Storage.save(todos);
+    }
+})
+
+//Oznaczenie jako zrobione
+document.addEventListener('click', function (e) {
+    if ('LI' === e.target.tagName) {
+        e.target.classList.toggle('done');
+        if (e.target.classList.contains('done')) {
+            todos[e.target.firstElementChild.id].completed = true;
+        }
+        else todos[e.target.firstElementChild].id = false;
+        Storage.save(todos);
+    }
+})
